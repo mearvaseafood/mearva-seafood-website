@@ -179,6 +179,23 @@
     }
     html[lang="ar"] .hero-support { letter-spacing: 0; }
 
+    /* ---------- Trust strip ---------- */
+    .trust { background: var(--white); border-bottom: 1px solid var(--line); padding: 0; }
+    .trust-inner {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+      padding: 14px 28px; row-gap: 6px;
+    }
+    .trust-item {
+      display: inline-flex; align-items: center;
+      font-size: 13px; font-weight: 300; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--navy);
+    }
+    .trust-item:not(:first-child)::before {
+      content: ""; width: 5px; height: 5px; border-radius: 50%;
+      background: var(--teal); display: inline-block; margin: 0 26px;
+    }
+    html[lang="ar"] .trust-item { letter-spacing: 0; text-transform: none; font-weight: 400; }
+
     /* ---------- About ---------- */
     .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
     .about-grid p + p { margin-top: 18px; }
@@ -207,6 +224,19 @@
       color: var(--navy); margin-bottom: 12px;
     }
     .card p { color: var(--muted); font-size: 15px; }
+
+    /* ---------- How we work ---------- */
+    .process-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-top: 56px; }
+    .process-item { border-top: 2px solid var(--navy); padding-top: 26px; }
+    .process-num {
+      font-family: "Space Grotesk", sans-serif; font-size: 13px; font-weight: 600;
+      color: var(--teal); letter-spacing: 0.1em; margin-bottom: 16px;
+    }
+    .process-item h3 {
+      font-family: "Space Grotesk", sans-serif; font-size: 19px; font-weight: 600;
+      color: var(--navy); margin-bottom: 8px;
+    }
+    .process-item p { font-size: 14.5px; color: var(--muted); }
 
     /* ---------- Why Us ---------- */
     .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-top: 56px; }
@@ -268,11 +298,11 @@
       .nav-toggle { display: block; }
       .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 44px; }
       .product-grid { grid-template-columns: 1fr; }
-      .why-grid { grid-template-columns: 1fr 1fr; }
+      .why-grid, .process-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 540px) {
       form .row { grid-template-columns: 1fr; }
-      .why-grid { grid-template-columns: 1fr; }
+      .why-grid, .process-grid { grid-template-columns: 1fr; }
       .footer-top { flex-direction: column; align-items: flex-start; }
       .nav-right { gap: 14px; }
       .lang-switch button { padding: 6px 8px; }
@@ -341,6 +371,16 @@
     </div>
   </section>
 
+  <!-- ===== Trust strip ===== -->
+  <section class="trust" aria-label="Key facts">
+    <div class="wrap trust-inner">
+      <span class="trust-item" data-i18n="trust.origin">Norwegian origin</span>
+      <span class="trust-item" data-i18n="trust.b2b">B2B supply</span>
+      <span class="trust-item" data-i18n="trust.cold">Cold chain</span>
+      <span class="trust-item" data-i18n="trust.focus">Saudi &amp; GCC focus</span>
+    </div>
+  </section>
+
   <!-- ===== About ===== -->
   <section class="about" id="about">
     <div class="wrap about-grid">
@@ -386,6 +426,37 @@
             <p data-i18n="product.shellfish.desc">Cold-water shrimp, king crab and langoustine. Graded, packed and delivered under strict temperature control.</p>
           </div>
         </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== How we work ===== -->
+  <section class="process" id="process">
+    <div class="wrap">
+      <p class="eyebrow" data-i18n="process.eyebrow">How we work</p>
+      <h2 class="section-title" data-i18n="process.title">A straightforward process, from inquiry to delivery</h2>
+
+      <div class="process-grid">
+        <div class="process-item">
+          <div class="process-num">01</div>
+          <h3 data-i18n="process.s1.title">Tell us your requirement</h3>
+          <p data-i18n="process.s1.desc">Product, grade, approximate volume and destination.</p>
+        </div>
+        <div class="process-item">
+          <div class="process-num">02</div>
+          <h3 data-i18n="process.s2.title">We confirm availability</h3>
+          <p data-i18n="process.s2.desc">Source, specification, packing and available quantity.</p>
+        </div>
+        <div class="process-item">
+          <div class="process-num">03</div>
+          <h3 data-i18n="process.s3.title">Quote &amp; logistics</h3>
+          <p data-i18n="process.s3.desc">Product price, shipping option and commercial terms.</p>
+        </div>
+        <div class="process-item">
+          <div class="process-num">04</div>
+          <h3 data-i18n="process.s4.title">Documentation &amp; shipment</h3>
+          <p data-i18n="process.s4.desc">Export documentation and cold-chain coordination.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -519,6 +590,10 @@
         "hero.headline": "Premium Norwegian Seafood for Saudi Arabia & the GCC",
         "hero.support": "B2B sourcing · Cold-chain logistics · Export documentation",
         "hero.cta": "Request Availability & Quote",
+        "trust.origin": "Norwegian origin",
+        "trust.b2b": "B2B supply",
+        "trust.cold": "Cold chain",
+        "trust.focus": "Saudi & GCC focus",
         "about.eyebrow": "About us",
         "about.title": "Seafood from Norwegian waters, delivered with confidence",
         "about.p1": "Mearva Seafood connects buyers around the world with the cold, clean waters of the Norwegian coast. We source directly from trusted producers and manage every shipment end to end.",
@@ -531,6 +606,16 @@
         "product.cod.desc": "Wild-caught Atlantic cod, fresh or frozen at sea. Loins, fillets and portions prepared to your specification.",
         "product.shellfish.title": "Shellfish",
         "product.shellfish.desc": "Cold-water shrimp, king crab and langoustine. Graded, packed and delivered under strict temperature control.",
+        "process.eyebrow": "How we work",
+        "process.title": "A straightforward process, from inquiry to delivery",
+        "process.s1.title": "Tell us your requirement",
+        "process.s1.desc": "Product, grade, approximate volume and destination.",
+        "process.s2.title": "We confirm availability",
+        "process.s2.desc": "Source, specification, packing and available quantity.",
+        "process.s3.title": "Quote & logistics",
+        "process.s3.desc": "Product price, shipping option and commercial terms.",
+        "process.s4.title": "Documentation & shipment",
+        "process.s4.desc": "Export documentation and cold-chain coordination.",
         "why.eyebrow": "Why us",
         "why.title": "Built for reliable, compliant seafood trade",
         "why.cold.title": "Cold chain",
@@ -561,6 +646,10 @@
         "hero.headline": "منتجات بحرية نرويجية لأسواق السعودية والخليج",
         "hero.support": "توريد B2B · سلسلة تبريد · تنسيق وثائق التصدير",
         "hero.cta": "اطلب التوفر وعرض السعر",
+        "trust.origin": "منشأ نرويجي",
+        "trust.b2b": "توريد B2B",
+        "trust.cold": "سلسلة تبريد",
+        "trust.focus": "تركيز على السعودية والخليج",
         "about.eyebrow": "من نحن",
         "about.title": "مأكولات بحرية من المياه النرويجية، نوصلها إليك بكل ثقة",
         "about.p1": "توصل ميارفا سيفود المشترين حول العالم بمياه الساحل النرويجي الباردة والنقية. نحصل على منتجاتنا مباشرة من منتجين موثوقين، وندير كل شحنة من البداية إلى النهاية.",
@@ -573,6 +662,16 @@
         "product.cod.desc": "سمك قد أطلسي مصطاد من البحر، طازج أو مجمّد في عرض البحر. قطع لحم وفيليه وحصص محضّرة حسب مواصفاتك.",
         "product.shellfish.title": "قشريات ومحار",
         "product.shellfish.desc": "روبيان المياه الباردة وسلطعون الملك والكركند. مصنّف ومعبّأ ومسلّم تحت رقابة حرارية صارمة.",
+        "process.eyebrow": "كيف نعمل",
+        "process.title": "عملية واضحة، من الاستفسار إلى التسليم",
+        "process.s1.title": "أرسل متطلباتك",
+        "process.s1.desc": "المنتج، المقاس، الكمية التقريبية والوجهة.",
+        "process.s2.title": "نتحقق من التوفر",
+        "process.s2.desc": "المصدر، المواصفات، التعبئة والكمية المتاحة.",
+        "process.s3.title": "السعر والخدمات اللوجستية",
+        "process.s3.desc": "سعر المنتج، خيار الشحن والشروط التجارية.",
+        "process.s4.title": "الوثائق والشحن",
+        "process.s4.desc": "تنسيق وثائق التصدير وسلسلة التبريد.",
         "why.eyebrow": "لماذا نحن",
         "why.title": "مبنيّون لتجارة مأكولات بحرية موثوقة ومتوافقة مع الأنظمة",
         "why.cold.title": "سلسلة التبريد",
@@ -603,6 +702,10 @@
         "hero.headline": "Premium norsk sjømat for Saudi-Arabia og GCC",
         "hero.support": "B2B-innkjøp · Kjølekjedelogistikk · Eksportdokumentasjon",
         "hero.cta": "Be om tilgjengelighet og tilbud",
+        "trust.origin": "Norsk opprinnelse",
+        "trust.b2b": "B2B-forsyning",
+        "trust.cold": "Kjølekjede",
+        "trust.focus": "Saudi & Gulfen",
         "about.eyebrow": "Om oss",
         "about.title": "Sjømat fra norske farvann, levert med trygghet",
         "about.p1": "Mearva Seafood forbinder kjøpere over hele verden med de kalde, rene farvannene langs norskekysten. Vi kjøper direkte fra betrodde produsenter og håndterer hver forsendelse fra start til slutt.",
@@ -615,6 +718,16 @@
         "product.cod.desc": "Villfanget atlantisk torsk, fersk eller fryst til havs. Rygg, filet og porsjoner tilberedt etter din spesifikasjon.",
         "product.shellfish.title": "Skalldyr",
         "product.shellfish.desc": "Kaldtvannsreker, kongekrabbe og sjøkreps. Sortert, pakket og levert under streng temperaturkontroll.",
+        "process.eyebrow": "Slik jobber vi",
+        "process.title": "En enkel prosess, fra forespørsel til levering",
+        "process.s1.title": "Fortell oss behovet ditt",
+        "process.s1.desc": "Produkt, kvalitet, omtrentlig volum og destinasjon.",
+        "process.s2.title": "Vi bekrefter tilgjengelighet",
+        "process.s2.desc": "Kilde, spesifikasjon, pakking og tilgjengelig kvantum.",
+        "process.s3.title": "Tilbud og logistikk",
+        "process.s3.desc": "Produktpris, fraktalternativ og kommersielle vilkår.",
+        "process.s4.title": "Dokumentasjon og forsendelse",
+        "process.s4.desc": "Eksportdokumentasjon og kjølekjedekoordinering.",
         "why.eyebrow": "Hvorfor oss",
         "why.title": "Bygget for pålitelig og forskriftsmessig sjømathandel",
         "why.cold.title": "Kjølekjede",

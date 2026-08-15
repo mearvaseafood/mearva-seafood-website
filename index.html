@@ -166,11 +166,18 @@
     .hero-lockup .wm { align-items: center; }
     .hero-lockup .wm-name { color: var(--white); font-size: clamp(48px, 8vw, 84px); }
     .hero-lockup .wm-sub { color: var(--slate); font-size: clamp(15px, 2vw, 22px); margin-top: 18px; }
-    .hero .tagline {
-      font-size: clamp(16px, 2.2vw, 20px); color: var(--slate);
-      font-weight: 400; letter-spacing: 0.02em; margin: 0 auto 42px; max-width: 520px;
+    .hero-headline {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(26px, 4.4vw, 44px); font-weight: 600;
+      letter-spacing: -0.02em; line-height: 1.15; color: var(--white);
+      max-width: 780px; margin: 0 auto 18px;
     }
-    html[lang="ar"] .hero .tagline { letter-spacing: 0; }
+    html[lang="ar"] .hero-headline { letter-spacing: 0; line-height: 1.45; }
+    .hero-support {
+      font-size: clamp(14px, 2vw, 18px); color: var(--slate);
+      font-weight: 400; letter-spacing: 0.02em; margin: 0 auto 42px; max-width: 640px;
+    }
+    html[lang="ar"] .hero-support { letter-spacing: 0; }
 
     /* ---------- About ---------- */
     .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
@@ -326,8 +333,9 @@
           <span class="wm-sub">SEAFOOD</span>
         </span>
       </div>
-      <p class="tagline" data-i18n="hero.tagline">Norwegian seafood export</p>
-      <a href="#contact" class="btn btn-primary" data-i18n="hero.cta">Request a quote
+      <h1 class="hero-headline" data-i18n="hero.headline">Premium Norwegian Seafood for Saudi Arabia &amp; the GCC</h1>
+      <p class="hero-support" data-i18n="hero.support">B2B sourcing &middot; Cold-chain logistics &middot; Export documentation</p>
+      <a href="#contact" class="btn btn-primary" data-i18n="hero.cta">Request Availability &amp; Quote
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
     </div>
@@ -508,8 +516,9 @@
     var I18N = {
       en: {
         "nav.products": "Products", "nav.about": "About", "nav.contact": "Contact",
-        "hero.tagline": "Norwegian seafood export",
-        "hero.cta": "Request a quote",
+        "hero.headline": "Premium Norwegian Seafood for Saudi Arabia & the GCC",
+        "hero.support": "B2B sourcing · Cold-chain logistics · Export documentation",
+        "hero.cta": "Request Availability & Quote",
         "about.eyebrow": "About us",
         "about.title": "Seafood from Norwegian waters, delivered with confidence",
         "about.p1": "Mearva Seafood connects buyers around the world with the cold, clean waters of the Norwegian coast. We source directly from trusted producers and manage every shipment end to end.",
@@ -549,8 +558,9 @@
       },
       ar: {
         "nav.products": "المنتجات", "nav.about": "من نحن", "nav.contact": "تواصل معنا",
-        "hero.tagline": "تصدير المأكولات البحرية النرويجية",
-        "hero.cta": "اطلب عرض سعر",
+        "hero.headline": "منتجات بحرية نرويجية لأسواق السعودية والخليج",
+        "hero.support": "توريد B2B · سلسلة تبريد · تنسيق وثائق التصدير",
+        "hero.cta": "اطلب التوفر وعرض السعر",
         "about.eyebrow": "من نحن",
         "about.title": "مأكولات بحرية من المياه النرويجية، نوصلها إليك بكل ثقة",
         "about.p1": "توصل ميارفا سيفود المشترين حول العالم بمياه الساحل النرويجي الباردة والنقية. نحصل على منتجاتنا مباشرة من منتجين موثوقين، وندير كل شحنة من البداية إلى النهاية.",
@@ -590,8 +600,9 @@
       },
       no: {
         "nav.products": "Produkter", "nav.about": "Om oss", "nav.contact": "Kontakt",
-        "hero.tagline": "Norsk sjømateksport",
-        "hero.cta": "Be om tilbud",
+        "hero.headline": "Premium norsk sjømat for Saudi-Arabia og GCC",
+        "hero.support": "B2B-innkjøp · Kjølekjedelogistikk · Eksportdokumentasjon",
+        "hero.cta": "Be om tilgjengelighet og tilbud",
         "about.eyebrow": "Om oss",
         "about.title": "Sjømat fra norske farvann, levert med trygghet",
         "about.p1": "Mearva Seafood forbinder kjøpere over hele verden med de kalde, rene farvannene langs norskekysten. Vi kjøper direkte fra betrodde produsenter og håndterer hver forsendelse fra start til slutt.",

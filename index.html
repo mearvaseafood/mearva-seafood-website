@@ -324,6 +324,11 @@
     html[dir="rtl"] select { background-position: left 16px center; padding-right: 16px; padding-left: 42px; }
     select option { color: #0D2340; }
     .form-note { font-size: 14px; margin-top: 16px; color: var(--teal-light); min-height: 20px; }
+    .form-success {
+      grid-column: 1 / -1; margin-top: 8px;
+      border: 1px solid var(--teal); color: var(--teal-light);
+      padding: 16px 18px; font-size: 15px;
+    }
 
     /* ---------- Footer ---------- */
     footer.site-footer { background: #081726; color: var(--slate); padding: 56px 0 40px; }
@@ -570,10 +575,10 @@
         <p class="contact-line"><span data-i18n="contact.webLabel">Web</span> <a href="https://www.mearvaseafood.com">www.mearvaseafood.com</a></p>
       </div>
 
-      <form id="quoteForm" novalidate>
+      <form id="quoteForm" action="https://api.web3forms.com/submit" method="POST" novalidate>
         <!-- Web3Forms delivery: replace the access_key value with your own free key from https://web3forms.com (enter sales@mearvaseafood.com to receive it). -->
-        <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY" />
-        <input type="hidden" name="subject" value="New quote request — Mearva Seafood" />
+        <input type="hidden" name="access_key" value="eeb54732-226c-49e3-8ae3-c374e8e34d28" />
+        <input type="hidden" name="subject" value="New Quote Request — Mearva Seafood" />
         <input type="hidden" name="from_name" value="Mearva Seafood website" />
         <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <div class="row">
@@ -619,6 +624,7 @@
         <button type="submit" class="btn btn-primary" data-i18n="form.submit">Submit request</button>
         <p class="form-note" id="formNote" role="status" aria-live="polite"></p>
       </form>
+      <div class="form-success" id="formSuccess" role="status" data-i18n="form.success" hidden>Thank you. We will contact you within 24 hours.</div>
     </div>
   </section>
 
@@ -721,6 +727,7 @@
         "form.sending": "Sending…",
         "form.error": "Something went wrong. Please email sales@mearvaseafood.com.",
         "form.thanks": "Thank you, {name}. We will be in touch shortly.",
+        "form.success": "Thank you. We will contact you within 24 hours.",
         "footer.rights": "All rights reserved."
       },
       ar: {
@@ -791,6 +798,7 @@
         "form.sending": "جارٍ الإرسال…",
         "form.error": "حدث خطأ ما. يرجى المراسلة على sales@mearvaseafood.com.",
         "form.thanks": "شكرًا لك، {name}. سنتواصل معك قريبًا.",
+        "form.success": "شكراً. سنتواصل معك خلال 24 ساعة.",
         "footer.rights": "جميع الحقوق محفوظة."
       },
       no: {
@@ -861,6 +869,7 @@
         "form.sending": "Sender…",
         "form.error": "Noe gikk galt. Send e-post til sales@mearvaseafood.com.",
         "form.thanks": "Takk, {name}. Vi tar kontakt snart.",
+        "form.success": "Takk. Vi kontakter deg innen 24 timer.",
         "footer.rights": "Med enerett."
       }
     };

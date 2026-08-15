@@ -225,6 +225,48 @@
     }
     .card p { color: var(--muted); font-size: 15px; }
 
+    /* Featured product */
+    .featured {
+      display: grid; grid-template-columns: 1.1fr 1fr;
+      margin-top: 52px; border: 1px solid var(--line); background: var(--white);
+      overflow: hidden;
+    }
+    .featured-media { min-height: 320px; }
+    .featured-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .featured-body { padding: clamp(32px, 4vw, 52px); align-self: center; }
+    .featured-label {
+      display: inline-block; font-size: 12px; font-weight: 600;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--teal);
+      margin-bottom: 18px;
+    }
+    html[lang="ar"] .featured-label { letter-spacing: 0; text-transform: none; }
+    .featured-body h3 {
+      font-family: "Space Grotesk", sans-serif; font-size: clamp(24px, 3vw, 32px);
+      font-weight: 600; color: var(--navy); line-height: 1.15; margin-bottom: 16px;
+    }
+    html[lang="ar"] .featured-body h3 { line-height: 1.4; }
+    .featured-body p { color: var(--muted); font-size: 16px; max-width: 48ch; }
+
+    /* Other seafood list */
+    .other-products { margin-top: 60px; }
+    .other-title {
+      font-family: "Space Grotesk", sans-serif; font-size: 19px; font-weight: 600;
+      color: var(--navy); margin-bottom: 22px;
+    }
+    .other-list {
+      list-style: none; display: grid; grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--line);
+    }
+    .other-list li {
+      display: flex; align-items: center; gap: 12px;
+      padding: 15px 2px; border-bottom: 1px solid var(--line);
+      font-size: 15px; color: var(--navy);
+    }
+    .other-list li::before {
+      content: ""; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--teal); flex-shrink: 0;
+    }
+
     /* ---------- How we work ---------- */
     .process-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-top: 56px; }
     .process-item { border-top: 2px solid var(--navy); padding-top: 26px; }
@@ -266,14 +308,21 @@
     form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     label { display: block; font-size: 12.5px; font-weight: 600; letter-spacing: 0.06em; margin-bottom: 9px; color: #c4d1de; }
     html[lang="ar"] label { letter-spacing: 0; }
-    input, textarea {
+    input, textarea, select {
       width: 100%; font-family: inherit; font-size: 15px; color: var(--white);
       background: #0a1c33; border: 1px solid var(--line-dark); padding: 14px 16px;
       transition: border-color 0.15s ease;
     }
     input::placeholder, textarea::placeholder { color: #5c7488; }
-    input:focus, textarea:focus { outline: none; border-color: var(--teal); }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--teal); }
     textarea { resize: vertical; min-height: 132px; }
+    select {
+      appearance: none; -webkit-appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%238FA3B8' stroke-width='2'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 16px center; padding-right: 42px;
+    }
+    html[dir="rtl"] select { background-position: left 16px center; padding-right: 16px; padding-left: 42px; }
+    select option { color: #0D2340; }
     .form-note { font-size: 14px; margin-top: 16px; color: var(--teal-light); min-height: 20px; }
 
     /* ---------- Footer ---------- */
@@ -297,11 +346,13 @@
       .nav-links a { padding: 13px 0; width: 100%; }
       .nav-toggle { display: block; }
       .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 44px; }
-      .product-grid { grid-template-columns: 1fr; }
+      .featured { grid-template-columns: 1fr; }
+      .other-list { grid-template-columns: 1fr 1fr; }
       .why-grid, .process-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 540px) {
       form .row { grid-template-columns: 1fr; }
+      .other-list { grid-template-columns: 1fr; }
       .why-grid, .process-grid { grid-template-columns: 1fr; }
       .footer-top { flex-direction: column; align-items: flex-start; }
       .nav-right { gap: 14px; }
@@ -402,30 +453,25 @@
       <p class="eyebrow" data-i18n="products.eyebrow">Products</p>
       <h2 class="section-title" data-i18n="products.title">A focused range, sourced and shipped to spec</h2>
 
-      <div class="product-grid">
-        <article class="card">
-          <div class="card-img"><img src="images/salmon.jpg" alt="Fresh salmon fillet" loading="lazy" /></div>
-          <div class="card-body">
-            <h3 data-i18n="product.salmon.title">Fresh salmon</h3>
-            <p data-i18n="product.salmon.desc">Atlantic salmon farmed in cold Norwegian fjords. Whole, gutted or filleted, packed fresh on ice for export.</p>
-          </div>
-        </article>
+      <article class="featured">
+        <div class="featured-media"><img src="images/salmon.jpg" alt="Fresh Norwegian Atlantic salmon" loading="lazy" /></div>
+        <div class="featured-body">
+          <span class="featured-label" data-i18n="product.featuredLabel">Featured product</span>
+          <h3 data-i18n="product.salmon.title">Fresh Norwegian Atlantic salmon</h3>
+          <p data-i18n="product.salmon.desc">Atlantic salmon sourced from certified Norwegian producers. Available whole gutted or filleted to specification. Cold-chain managed from Norway to your destination.</p>
+        </div>
+      </article>
 
-        <article class="card">
-          <div class="card-img"><img src="images/cod.jpg" alt="Fresh fish on ice" loading="lazy" /></div>
-          <div class="card-body">
-            <h3 data-i18n="product.cod.title">Cod</h3>
-            <p data-i18n="product.cod.desc">Wild-caught Atlantic cod, fresh or frozen at sea. Loins, fillets and portions prepared to your specification.</p>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="card-img"><img src="images/shellfish.jpg" alt="Cold-water shrimp" loading="lazy" /></div>
-          <div class="card-body">
-            <h3 data-i18n="product.shellfish.title">Shellfish</h3>
-            <p data-i18n="product.shellfish.desc">Cold-water shrimp, king crab and langoustine. Graded, packed and delivered under strict temperature control.</p>
-          </div>
-        </article>
+      <div class="other-products">
+        <h3 class="other-title" data-i18n="product.otherTitle">Other Norwegian seafood &mdash; available on request</h3>
+        <ul class="other-list">
+          <li data-i18n="product.trout">Rainbow trout</li>
+          <li data-i18n="product.cod">Cod</li>
+          <li data-i18n="product.haddock">Haddock</li>
+          <li data-i18n="product.mackerel">Mackerel</li>
+          <li data-i18n="product.shrimp">Cold-water shrimp</li>
+          <li data-i18n="product.kingcrab">King crab</li>
+        </ul>
       </div>
     </div>
   </section>
@@ -513,7 +559,7 @@
     <div class="wrap contact-grid">
       <div class="contact-info">
         <p class="eyebrow" data-i18n="contact.eyebrow">Contact</p>
-        <h2 class="section-title" data-i18n="contact.title">Request a quote</h2>
+        <h2 class="section-title" data-i18n="contact.title">Request Availability &amp; Quote</h2>
         <p class="lead" data-i18n="contact.lead">Tell us what you need and where you need it. We will get back to you with availability and pricing.</p>
         <a href="tel:+4794446668" class="btn btn-outline call-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z"/></svg>
@@ -540,9 +586,31 @@
             <input type="text" id="company" name="company" data-i18n-ph="form.companyPh" placeholder="Company name" required />
           </div>
         </div>
-        <div class="field">
-          <label for="email" data-i18n="form.email">Email</label>
-          <input type="email" id="email" name="email" data-i18n-ph="form.emailPh" placeholder="you@company.com" required />
+        <div class="row">
+          <div class="field">
+            <label for="email" data-i18n="form.email">Email</label>
+            <input type="email" id="email" name="email" data-i18n-ph="form.emailPh" placeholder="you@company.com" required />
+          </div>
+          <div class="field">
+            <label for="country" data-i18n="form.country">Country</label>
+            <input type="text" id="country" name="country" data-i18n-ph="form.countryPh" placeholder="Destination country" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="product" data-i18n="form.product">Product</label>
+            <select id="product" name="product">
+              <option value="" data-i18n="form.productSelect">Select a product</option>
+              <option value="Fresh Atlantic salmon" data-i18n="form.opt.salmon">Fresh Atlantic salmon</option>
+              <option value="Rainbow trout" data-i18n="form.opt.trout">Rainbow trout</option>
+              <option value="Cod" data-i18n="form.opt.cod">Cod</option>
+              <option value="Other Norwegian seafood" data-i18n="form.opt.other">Other Norwegian seafood</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="volume" data-i18n="form.volume">Approximate volume</label>
+            <input type="text" id="volume" name="volume" data-i18n-ph="form.volumePh" placeholder="e.g. 200 kg per week" />
+          </div>
         </div>
         <div class="field">
           <label for="message" data-i18n="form.message">Message</label>
@@ -600,12 +668,16 @@
         "about.p2": "Our focus is simple: consistent quality, dependable volumes and full traceability from the source to your port. We work with importers, wholesalers and processors who value a partner they can rely on.",
         "products.eyebrow": "Products",
         "products.title": "A focused range, sourced and shipped to spec",
-        "product.salmon.title": "Fresh salmon",
-        "product.salmon.desc": "Atlantic salmon farmed in cold Norwegian fjords. Whole, gutted or filleted, packed fresh on ice for export.",
-        "product.cod.title": "Cod",
-        "product.cod.desc": "Wild-caught Atlantic cod, fresh or frozen at sea. Loins, fillets and portions prepared to your specification.",
-        "product.shellfish.title": "Shellfish",
-        "product.shellfish.desc": "Cold-water shrimp, king crab and langoustine. Graded, packed and delivered under strict temperature control.",
+        "product.featuredLabel": "Featured product",
+        "product.salmon.title": "Fresh Norwegian Atlantic salmon",
+        "product.salmon.desc": "Atlantic salmon sourced from certified Norwegian producers. Available whole gutted or filleted to specification. Cold-chain managed from Norway to your destination.",
+        "product.otherTitle": "Other Norwegian seafood — available on request",
+        "product.trout": "Rainbow trout",
+        "product.cod": "Cod",
+        "product.haddock": "Haddock",
+        "product.mackerel": "Mackerel",
+        "product.shrimp": "Cold-water shrimp",
+        "product.kingcrab": "King crab",
         "process.eyebrow": "How we work",
         "process.title": "A straightforward process, from inquiry to delivery",
         "process.s1.title": "Tell us your requirement",
@@ -627,7 +699,7 @@
         "why.reliable.title": "Responsive B2B supply",
         "why.reliable.desc": "Availability, grades and schedules are confirmed against each order.",
         "contact.eyebrow": "Contact",
-        "contact.title": "Request a quote",
+        "contact.title": "Request Availability & Quote",
         "contact.lead": "Tell us what you need and where you need it. We will get back to you with availability and pricing.",
         "contact.call": "Call sales",
         "contact.phoneLabel": "Phone", "contact.emailLabel": "Email", "contact.webLabel": "Web",
@@ -635,6 +707,16 @@
         "form.submit": "Submit request",
         "form.namePh": "Your name", "form.companyPh": "Company name",
         "form.emailPh": "you@company.com", "form.messagePh": "Products, volumes and destination",
+        "form.country": "Country",
+        "form.countryPh": "Destination country",
+        "form.product": "Product",
+        "form.productSelect": "Select a product",
+        "form.opt.salmon": "Fresh Atlantic salmon",
+        "form.opt.trout": "Rainbow trout",
+        "form.opt.cod": "Cod",
+        "form.opt.other": "Other Norwegian seafood",
+        "form.volume": "Approximate volume",
+        "form.volumePh": "e.g. 200 kg per week",
         "form.incomplete": "Please complete all fields.",
         "form.sending": "Sending…",
         "form.error": "Something went wrong. Please email sales@mearvaseafood.com.",
@@ -656,12 +738,16 @@
         "about.p2": "تركيزنا بسيط: جودة ثابتة، وكميات يُعتمد عليها، وإمكانية تتبّع كاملة من المصدر إلى مينائك. نعمل مع المستوردين وتجار الجملة والمصنّعين الذين يقدّرون وجود شريك يثقون به.",
         "products.eyebrow": "المنتجات",
         "products.title": "تشكيلة مركّزة، نوفّرها ونشحنها حسب المواصفات",
-        "product.salmon.title": "سلمون طازج",
-        "product.salmon.desc": "سلمون أطلسي مستزرع في المضايق النرويجية الباردة. كامل أو منظّف أو مقطّع فيليه، معبّأ طازجًا على الثلج للتصدير.",
-        "product.cod.title": "سمك القد",
-        "product.cod.desc": "سمك قد أطلسي مصطاد من البحر، طازج أو مجمّد في عرض البحر. قطع لحم وفيليه وحصص محضّرة حسب مواصفاتك.",
-        "product.shellfish.title": "قشريات ومحار",
-        "product.shellfish.desc": "روبيان المياه الباردة وسلطعون الملك والكركند. مصنّف ومعبّأ ومسلّم تحت رقابة حرارية صارمة.",
+        "product.featuredLabel": "منتج مميز",
+        "product.salmon.title": "سلمون أطلسي نرويجي طازج",
+        "product.salmon.desc": "سلمون أطلسي من منتجين نرويجيين معتمدين. متوفر كامل منظّف أو مقطّع فيليه حسب المواصفات. تُدار سلسلة التبريد من النرويج إلى وجهتك.",
+        "product.otherTitle": "منتجات بحرية نرويجية أخرى — متاحة عند الطلب",
+        "product.trout": "تراوت قوس قزح",
+        "product.cod": "سمك القد",
+        "product.haddock": "الحدوق",
+        "product.mackerel": "الماكريل",
+        "product.shrimp": "روبيان المياه الباردة",
+        "product.kingcrab": "سرطان البحر الملكي",
         "process.eyebrow": "كيف نعمل",
         "process.title": "عملية واضحة، من الاستفسار إلى التسليم",
         "process.s1.title": "أرسل متطلباتك",
@@ -683,7 +769,7 @@
         "why.reliable.title": "توريد B2B سريع الاستجابة",
         "why.reliable.desc": "يتم تأكيد التوافر والدرجات والجداول الزمنية مع كل طلب.",
         "contact.eyebrow": "تواصل معنا",
-        "contact.title": "اطلب عرض سعر",
+        "contact.title": "اطلب التوفر وعرض السعر",
         "contact.lead": "أخبرنا بما تحتاجه وأين تحتاجه، وسنعاود التواصل معك بالتوافر والأسعار.",
         "contact.call": "اتصل بالمبيعات",
         "contact.phoneLabel": "الهاتف", "contact.emailLabel": "البريد الإلكتروني", "contact.webLabel": "الموقع",
@@ -691,6 +777,16 @@
         "form.submit": "إرسال الطلب",
         "form.namePh": "اسمك", "form.companyPh": "اسم الشركة",
         "form.emailPh": "you@company.com", "form.messagePh": "المنتجات والكميات والوجهة",
+        "form.country": "الدولة",
+        "form.countryPh": "بلد الوجهة",
+        "form.product": "المنتج",
+        "form.productSelect": "اختر منتجًا",
+        "form.opt.salmon": "سلمون أطلسي طازج",
+        "form.opt.trout": "تراوت قوس قزح",
+        "form.opt.cod": "سمك القد",
+        "form.opt.other": "منتجات بحرية نرويجية أخرى",
+        "form.volume": "الكمية التقريبية",
+        "form.volumePh": "مثال: 200 كيلو أسبوعياً",
         "form.incomplete": "الرجاء تعبئة جميع الحقول.",
         "form.sending": "جارٍ الإرسال…",
         "form.error": "حدث خطأ ما. يرجى المراسلة على sales@mearvaseafood.com.",
@@ -712,12 +808,16 @@
         "about.p2": "Fokuset vårt er enkelt: jevn kvalitet, pålitelige volumer og full sporbarhet fra kilden til din havn. Vi jobber med importører, grossister og foredlingsbedrifter som verdsetter en partner de kan stole på.",
         "products.eyebrow": "Produkter",
         "products.title": "Et fokusert sortiment, kjøpt inn og sendt etter spesifikasjon",
-        "product.salmon.title": "Fersk laks",
-        "product.salmon.desc": "Atlantisk laks oppdrettet i kalde norske fjorder. Hel, sløyd eller filetert, pakket fersk på is for eksport.",
-        "product.cod.title": "Torsk",
-        "product.cod.desc": "Villfanget atlantisk torsk, fersk eller fryst til havs. Rygg, filet og porsjoner tilberedt etter din spesifikasjon.",
-        "product.shellfish.title": "Skalldyr",
-        "product.shellfish.desc": "Kaldtvannsreker, kongekrabbe og sjøkreps. Sortert, pakket og levert under streng temperaturkontroll.",
+        "product.featuredLabel": "Utvalgt produkt",
+        "product.salmon.title": "Fersk norsk atlanterhavslaks",
+        "product.salmon.desc": "Atlanterhavslaks fra sertifiserte norske produsenter. Tilgjengelig hel sløyd eller filetert etter spesifikasjon. Kjølekjede håndtert fra Norge til din destinasjon.",
+        "product.otherTitle": "Annen norsk sjømat — tilgjengelig på forespørsel",
+        "product.trout": "Regnbueørret",
+        "product.cod": "Torsk",
+        "product.haddock": "Hyse",
+        "product.mackerel": "Makrell",
+        "product.shrimp": "Kaldtvannsreker",
+        "product.kingcrab": "Kongekrabbe",
         "process.eyebrow": "Slik jobber vi",
         "process.title": "En enkel prosess, fra forespørsel til levering",
         "process.s1.title": "Fortell oss behovet ditt",
@@ -739,7 +839,7 @@
         "why.reliable.title": "Responsiv B2B-forsyning",
         "why.reliable.desc": "Tilgjengelighet, kvaliteter og leveringsplaner bekreftes for hver bestilling.",
         "contact.eyebrow": "Kontakt",
-        "contact.title": "Be om tilbud",
+        "contact.title": "Be om tilgjengelighet og tilbud",
         "contact.lead": "Fortell oss hva du trenger og hvor du trenger det. Vi kommer tilbake til deg med tilgjengelighet og pris.",
         "contact.call": "Ring salg",
         "contact.phoneLabel": "Telefon", "contact.emailLabel": "E-post", "contact.webLabel": "Nett",
@@ -747,6 +847,16 @@
         "form.submit": "Send forespørsel",
         "form.namePh": "Ditt navn", "form.companyPh": "Firmanavn",
         "form.emailPh": "you@company.com", "form.messagePh": "Produkter, volumer og destinasjon",
+        "form.country": "Land",
+        "form.countryPh": "Destinasjonsland",
+        "form.product": "Produkt",
+        "form.productSelect": "Velg et produkt",
+        "form.opt.salmon": "Fersk atlanterhavslaks",
+        "form.opt.trout": "Regnbueørret",
+        "form.opt.cod": "Torsk",
+        "form.opt.other": "Annen norsk sjømat",
+        "form.volume": "Omtrentlig volum",
+        "form.volumePh": "f.eks. 200 kg per uke",
         "form.incomplete": "Vennligst fyll ut alle feltene.",
         "form.sending": "Sender…",
         "form.error": "Noe gikk galt. Send e-post til sales@mearvaseafood.com.",

@@ -325,10 +325,14 @@
     select option { color: #0D2340; }
     .form-note { font-size: 14px; margin-top: 16px; color: var(--teal-light); min-height: 20px; }
     .form-success {
-      grid-column: 1 / -1; margin-top: 8px;
+      align-self: start;
+      display: flex; align-items: flex-start; gap: 14px;
       border: 1px solid var(--teal); color: var(--teal-light);
-      padding: 16px 18px; font-size: 15px;
+      padding: 24px; font-size: 16px; line-height: 1.6;
     }
+    .form-success[hidden] { display: none; }
+    .form-success svg { width: 24px; height: 24px; flex-shrink: 0; margin-top: 2px; }
+    .form-success p { margin: 0; }
 
     /* ---------- Footer ---------- */
     footer.site-footer { background: #081726; color: var(--slate); padding: 56px 0 40px; }
@@ -624,7 +628,10 @@
         <button type="submit" class="btn btn-primary" data-i18n="form.submit">Submit request</button>
         <p class="form-note" id="formNote" role="status" aria-live="polite"></p>
       </form>
-      <div class="form-success" id="formSuccess" role="status" data-i18n="form.success" hidden>Thank you. We will contact you within 24 hours.</div>
+      <div class="form-success" id="formSuccess" role="status" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+        <p data-i18n="form.success">Thank you. We will contact you within 24 hours.</p>
+      </div>
     </div>
   </section>
 
@@ -951,8 +958,12 @@
           .then(function (res) { return res.json(); })
           .then(function (json) {
             if (json && json.success) {
-              note.textContent = dict["form.thanks"].replace("{name}", name);
               form.reset();
+              note.textContent = "";
+              form.hidden = true;
+              var ok = document.getElementById("formSuccess");
+              ok.hidden = false;
+              ok.scrollIntoView({ block: "center", behavior: "smooth" });
             } else {
               note.textContent = dict["form.error"];
             }

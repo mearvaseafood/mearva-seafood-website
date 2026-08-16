@@ -1,9 +1,12 @@
-# Cloudflare Worker config for the Mearva Seafood chat backend.
+# Cloudflare Worker config for the Mearva Seafood chat + lead backend.
 #
-# The Anthropic API key is NOT stored here. Set it as a secret:
-#   npx wrangler secret put ANTHROPIC_API_KEY
+# Secrets are NOT stored here. Set them once (never commit their values):
+#   npx wrangler secret put ANTHROPIC_API_KEY   # Anthropic key (already set)
+#   npx wrangler secret put WEB3FORMS_KEY        # Web3Forms access key for /api/lead
 #
-# Never commit the key to this file or the repository.
+# WEB3FORMS_KEY is the same access key the website quote form already uses
+# (delivers to sales@mearvaseafood.com). /api/lead submits to Web3Forms
+# server-side so the key never appears in widget.js or the repo.
 
 name = "mearva-chat"
 main = "worker.js"

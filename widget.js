@@ -271,8 +271,10 @@
     P + " .mrv-foot button:hover{background:" + TEAL_LIGHT + "}" +
     P + " .mrv-foot button:disabled{opacity:.5;cursor:default}" +
     // Mobile
-    "@media (max-width:480px){" + P + "{inset-inline:8px;bottom:8px;width:auto;" +
-    "height:88vh;height:88dvh;max-height:none}.mrv-launch{bottom:14px;inset-inline-end:14px}}";
+    "@media (max-width:480px){" + P + "{inset-inline:8px;width:auto;" +
+    "bottom:calc(8px + env(safe-area-inset-bottom, 0px));" +
+    "height:88vh;height:88dvh;max-height:none}" +
+    ".mrv-launch{bottom:calc(16px + env(safe-area-inset-bottom, 0px));inset-inline-end:14px}}";
 
   // STRATA diamond mark. `light` = for dark backgrounds.
   function diamond(light) {

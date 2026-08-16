@@ -986,5 +986,12 @@
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 
+  <!-- ===== Ask Mearva chat widget ===== -->
+  <!-- Point this at your deployed Cloudflare Worker (see worker/README.md). -->
+  <script>
+    window.MEARVA_CHAT_API_URL = "https://mearva-chat.mearva.workers.dev/api/chat";
+  </script>
+  <script src="widget.js" defer></script>
+
 </body>
 </html>

@@ -3,3 +3,8 @@
 
 # Editor / preview tooling (not part of the website)
 .claude/
+
+# Cloudflare Worker — never commit secrets or local state
+worker/.dev.vars
+.wrangler/
+node_modules/

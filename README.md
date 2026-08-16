@@ -7,9 +7,19 @@ Trilingual: English · العربية · Norsk. Pure HTML + CSS + vanilla JS, no
 
 ```
 index.html        # the whole site (markup, styles, translations, scripts)
+widget.js         # "Ask Mearva" chat widget (frontend, loaded by index.html)
+worker/           # secure chat backend (Cloudflare Worker) — see worker/README.md
 images/           # product & about photos (salmon, cod, shellfish, about)
 .nojekyll         # tells GitHub Pages to serve files as-is
 ```
+
+## Ask Mearva chat assistant
+
+The site includes a trilingual AI chat widget. The Anthropic API key stays
+server-side in a Cloudflare Worker (`worker/`) and never appears in any file
+served to the browser. To enable it, deploy the Worker and set
+`window.MEARVA_CHAT_API_URL` in `index.html` — full steps in
+[`worker/README.md`](worker/README.md).
 
 ## Edit
 

@@ -1,0 +1,23 @@
+# Cloudflare Worker config for the Mearva Seafood chat backend.
+#
+# The Anthropic API key is NOT stored here. Set it as a secret:
+#   npx wrangler secret put ANTHROPIC_API_KEY
+#
+# Never commit the key to this file or the repository.
+
+name = "mearva-chat"
+main = "worker.js"
+compatibility_date = "2026-08-15"
+
+# Optional: override the model without editing code.
+# Default in worker.js is claude-sonnet-4-6.
+[vars]
+MODEL = "claude-sonnet-4-6"
+
+# Rate limiting store (20 requests / IP / hour). Create it once with:
+#   npx wrangler kv namespace create RATE_LIMIT
+# then paste the returned id below. If this binding is omitted, the Worker
+# still runs but rate limiting is disabled.
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "02eb1d06b5e3481fb082469f9b01ae16"

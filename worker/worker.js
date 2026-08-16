@@ -205,6 +205,26 @@ async function handleLead(request, env, cors, ip) {
   }
 
   const timestamp = new Date().toISOString();
+
+  // Marketing consent — separate from the enquiry, defaults to NO. Only an
+  // explicit "yes" counts; everything else is recorded as NO.
+  const consentYes = body && body.marketing_consent === "yes";
+  const consentLabel = consentYes ? "YES" : "NO";
+  // Explicit allowlist — never classify an unknown source as Ask Mearva.
+  const rawSource = clean(body && body.marketing_consent_source, 40);
+  const consentSource =
+    rawSource === "website_quote_form"
+      ? "Website Quote Form"
+      : rawSource === "ask_mearva"
+        ? "Ask Mearva"
+        : "Unknown";
+  // Authoritative consent timestamp is ALWAYS generated server-side. The
+  // client-supplied value is never trusted as the official record; it is kept
+  // separately and clearly labelled as client-reported (diagnostic only).
+  const consentTimestamp = new Date().toISOString();
+  const consentTimestampClient = clean(body && body.marketing_consent_timestamp, 40) || "—";
+  const consentLanguage = clean(body && body.marketing_consent_language, 8) || "—";
+
   const summary = [
     `Source: Ask Mearva AI Assistant`,
     `Name: ${lead.name}`,
@@ -217,6 +237,11 @@ async function handleLead(request, env, cors, ip) {
     `Approximate Volume: ${lead.volume}`,
     `Timing: ${lead.timing || "—"}`,
     `Requirement Summary: ${lead.notes || "—"}`,
+    ``,
+    `Marketing Consent: ${consentLabel}`,
+    `Consent Source: ${consentSource}`,
+    `Consent Timestamp: ${consentTimestamp}`,
+    `Consent Timestamp (client-reported): ${consentTimestampClient}`,
     `Submitted: ${timestamp}`,
   ].join("\n");
 
@@ -236,6 +261,11 @@ async function handleLead(request, env, cors, ip) {
     "Approximate Volume": lead.volume,
     Timing: lead.timing || "—",
     "Requirement Summary": lead.notes || "—",
+    "Marketing Consent": consentLabel,
+    "Consent Source": consentSource,
+    "Consent Timestamp": consentTimestamp,
+    "Consent Timestamp (client-reported)": consentTimestampClient,
+    "Consent Language": consentLanguage,
     Submitted: timestamp,
     message: summary,
   };

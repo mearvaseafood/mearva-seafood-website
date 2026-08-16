@@ -1,20 +1,34 @@
 # Mearva Seafood — chat backend (Cloudflare Worker)
 
-Secure backend for the **Ask Mearva** website assistant. The Anthropic API
-key lives only in the Worker's environment — never in `index.html`,
-`widget.js`, or this repository.
+Secure backend for the **Ask Mearva** website assistant. Secrets live only in
+the Worker's environment — never in `index.html`, `widget.js`, or this repo.
 
 ```
 Visitor → widget.js (index.html)
-        → POST /api/chat  (this Worker)
-        → Anthropic Messages API (claude-sonnet-4-6)
-        → reply → widget
+        → POST /api/chat  (this Worker) → Anthropic Messages API → reply
+        → POST /api/lead  (this Worker) → Web3Forms → sales@mearvaseafood.com
 ```
+
+`/api/lead` validates + sanitizes the structured enquiry server-side, rate-
+limits it (5 / IP / hour), and forwards it to the same Web3Forms destination
+the website quote form already uses. It returns `{ ok: true }` only when
+Web3Forms confirms delivery, so the widget never claims "sent" prematurely.
+
+## Secrets (set once, never committed)
+
+```bash
+npx wrangler secret put ANTHROPIC_API_KEY   # Anthropic key
+npx wrangler secret put WEB3FORMS_KEY        # Web3Forms access key for /api/lead
+```
+
+`WEB3FORMS_KEY` is the same access key the website form uses (the value in
+`index.html`'s `access_key` field). Setting it here lets the Worker submit
+leads server-side with validation and rate-limiting.
 
 ## Files
 
 ```
-worker.js          # request handling, CORS, rate limiting, Anthropic call
+worker.js          # routing, CORS, rate limiting, Anthropic call, lead submit
 system-prompt.js   # the Mearva persona + rules (embedded, server-side)
 knowledge-base.js  # approved facts the assistant may use (server-side)
 wrangler.toml      # Cloudflare deploy config (no secrets)

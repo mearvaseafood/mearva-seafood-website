@@ -15,6 +15,11 @@
     (typeof window !== "undefined" && window.MEARVA_CHAT_API_URL) ||
     "https://mearva-chat.mearva.workers.dev/api/chat";
 
+  // Lead endpoint lives next to the chat endpoint on the same Worker.
+  var API_LEAD_URL = API_URL.replace(/\/api\/chat(\/?)$/, "/api/lead$1");
+
+  var SALES_EMAIL = "sales@mearvaseafood.com";
+
   var NAVY = "#0D2340";
   var TEAL = "#2A9D8F";
   var TEAL_LIGHT = "#3FBDAC";
@@ -36,6 +41,21 @@
       error:
         "Something went wrong while preparing the answer. Please try again, " +
         "or contact sales@mearvaseafood.com.",
+      sendToSales: "Send to Sales",
+      editDetails: "Edit Details",
+      sending: "Sending…",
+      sentBadge: "Request sent ✓",
+      sent:
+        "Thank you. Your request has been sent to the Mearva sales team. They " +
+        "will review the product, availability and logistics and contact you at {email}.",
+      sendFail:
+        "We couldn't send the request right now. Your enquiry has not been " +
+        "confirmed as submitted. Please try again or contact sales@mearvaseafood.com.",
+      tryAgain: "Try Again",
+      emailSales: "Email Sales",
+      editHint: "I'd like to edit the details before sending.",
+      newEnquiry: "New enquiry",
+      learnShipping: "How does shipping work?",
       quick: [
         "Explore Norwegian Salmon",
         "Fresh or Frozen?",
@@ -58,6 +78,21 @@
       error:
         "حدث خطأ أثناء تجهيز الإجابة. حاول مرة أخرى، أو تواصل معنا عبر " +
         "sales@mearvaseafood.com.",
+      sendToSales: "إرسال الطلب",
+      editDetails: "تعديل البيانات",
+      sending: "جارٍ الإرسال…",
+      sentBadge: "تم إرسال الطلب ✓",
+      sent:
+        "شكراً لك. تم إرسال طلبك إلى فريق مبيعات Mearva. سيقوم الفريق بمراجعة " +
+        "المنتج والتوفر والخدمات اللوجستية والتواصل معك عبر {email}.",
+      sendFail:
+        "تعذر إرسال الطلب حالياً. لم نفقد بيانات طلبك. يمكنك المحاولة مرة أخرى " +
+        "أو التواصل مباشرة عبر sales@mearvaseafood.com.",
+      tryAgain: "حاول مرة أخرى",
+      emailSales: "مراسلة المبيعات",
+      editHint: "أريد تعديل البيانات قبل الإرسال.",
+      newEnquiry: "طلب جديد",
+      learnShipping: "كيف يعمل الشحن؟",
       quick: [
         "اكتشف السلمون النرويجي",
         "طازج أم مجمد؟",
@@ -81,6 +116,21 @@
       error:
         "Noe gikk galt under utarbeidelsen av svaret. Prøv igjen, eller " +
         "kontakt sales@mearvaseafood.com.",
+      sendToSales: "Send til salg",
+      editDetails: "Rediger detaljer",
+      sending: "Sender…",
+      sentBadge: "Forespørsel sendt ✓",
+      sent:
+        "Takk. Forespørselen din er sendt til Mearvas salgsteam. De vil vurdere " +
+        "produkt, tilgjengelighet og logistikk og kontakte deg på {email}.",
+      sendFail:
+        "Vi kunne ikke sende forespørselen nå. Forespørselen din er ikke " +
+        "bekreftet sendt. Prøv igjen eller kontakt sales@mearvaseafood.com.",
+      tryAgain: "Prøv igjen",
+      emailSales: "Send e-post",
+      editHint: "Jeg vil redigere detaljene før sending.",
+      newEnquiry: "Ny forespørsel",
+      learnShipping: "Hvordan fungerer frakt?",
       quick: [
         "Utforsk norsk laks",
         "Fersk eller fryst?",
@@ -164,6 +214,12 @@
     "border-radius:20px;padding:7px 13px;font:inherit;font-size:13.5px;cursor:pointer;" +
     "line-height:1.3;transition:background .12s ease,color .12s ease,border-color .12s ease}" +
     P + " .mrv-chip:hover{background:" + TEAL + ";color:#fff;border-color:" + TEAL + "}" +
+    P + " .mrv-chip-primary{background:" + TEAL + ";color:#fff;border-color:" + TEAL + "}" +
+    P + " .mrv-chip-primary:hover{background:" + TEAL_LIGHT + ";border-color:" + TEAL_LIGHT + "}" +
+    P + " .mrv-chip:disabled{opacity:.55;cursor:default;background:#fff;color:" + NAVY + ";border-color:#cfe0dc}" +
+    P + " .mrv-chip-primary:disabled{opacity:.7;cursor:default;background:" + TEAL + ";color:#fff}" +
+    P + " .mrv-sent{display:inline-flex;align-items:center;gap:6px;background:#e8f3f1;color:" + NAVY + ";" +
+    "border:1px solid #cfe0dc;border-radius:20px;padding:7px 13px;font-size:13.5px;font-weight:600}" +
     // Typing
     P + " .mrv-typing{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;" +
     "background:#fff;border:1px solid #e6ebef;border-radius:14px;border-bottom-left-radius:5px;padding:11px 14px}" +
@@ -244,20 +300,31 @@
 
   function renderMarkdown(text) {
     var suggestions = [];
+    var lead = null;
     var lines = String(text || "").replace(/\r/g, "").split("\n");
 
-    // Pull out the ::SUGGEST:: line(s).
+    // Pull out the ::LEAD:: and ::SUGGEST:: machine lines (never displayed).
     var kept = [];
     lines.forEach(function (ln) {
+      var mL = ln.match(/^\s*::LEAD::\s*(.*)$/i);
+      if (mL) {
+        try {
+          var parsed = JSON.parse(mL[1]);
+          if (parsed && typeof parsed === "object") lead = parsed;
+        } catch (e) {
+          /* malformed lead line — ignore, show nothing */
+        }
+        return;
+      }
       var m = ln.match(/^\s*::SUGGEST::\s*(.*)$/i);
       if (m) {
         m[1].split("::").forEach(function (opt) {
           var t = opt.trim();
           if (t) suggestions.push(t);
         });
-      } else {
-        kept.push(ln);
+        return;
       }
+      kept.push(ln);
     });
 
     var html = "";
@@ -296,7 +363,7 @@
     });
     flush();
 
-    return { html: html || "<p></p>", suggestions: suggestions.slice(0, 4) };
+    return { html: html || "<p></p>", suggestions: suggestions.slice(0, 4), lead: lead };
   }
 
   // ---- State ---------------------------------------------------------------
@@ -398,7 +465,8 @@
     div.setAttribute("dir", isRTL(text) ? "rtl" : "ltr");
     div.innerHTML = out.html;
     els.body.appendChild(div);
-    if (out.suggestions.length) appendChips(out.suggestions);
+    if (out.lead) appendLeadActions(out.lead);
+    else if (out.suggestions.length) appendChips(out.suggestions);
   }
 
   function userBubble(text) {
@@ -409,19 +477,134 @@
     els.body.appendChild(div);
   }
 
-  function appendChips(items) {
+  function makeChip(label, primary) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "mrv-chip" + (primary ? " mrv-chip-primary" : "");
+    b.textContent = label;
+    return b;
+  }
+
+  function newRow() {
     var wrap = document.createElement("div");
     wrap.className = "mrv-quick";
     wrap.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+    return wrap;
+  }
+
+  function appendChips(items) {
+    var wrap = newRow();
     items.forEach(function (q) {
-      var chip = document.createElement("button");
-      chip.type = "button";
-      chip.className = "mrv-chip";
-      chip.textContent = q;
+      var chip = makeChip(q, false);
       chip.addEventListener("click", function () { submitMessage(q); });
       wrap.appendChild(chip);
     });
     els.body.appendChild(wrap);
+  }
+
+  // ---- Lead handoff --------------------------------------------------------
+  // The model prepares the lead and appends a hidden ::LEAD:: JSON line. The
+  // widget shows Send / Edit, and ONLY the backend result decides whether we
+  // may say "sent". Nothing here claims success on its own.
+  function appendLeadActions(lead) {
+    var row = newRow();
+    var send = makeChip(t().sendToSales, true);
+    var edit = makeChip(t().editDetails, false);
+    send.addEventListener("click", function () { submitLead(lead, row, send); });
+    edit.addEventListener("click", function () {
+      if (row.dataset.busy === "1" || row.dataset.done === "1") return;
+      submitMessage(t().editHint);
+    });
+    row.appendChild(send);
+    row.appendChild(edit);
+    els.body.appendChild(row);
+    maybeScroll();
+  }
+
+  function submitLead(lead, row, btn) {
+    if (row.dataset.busy === "1" || row.dataset.done === "1") return; // no double-submit
+    row.dataset.busy = "1";
+    row.querySelectorAll("button").forEach(function (b) { b.disabled = true; });
+    btn.textContent = t().sending;
+
+    fetch(API_LEAD_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ lead: lead, language: lang }),
+    })
+      .then(function (r) {
+        return r.json().then(function (d) { return { ok: r.ok, data: d }; }, function () {
+          return { ok: r.ok, data: {} };
+        });
+      })
+      .then(function (res) {
+        var success = res.ok && res.data && res.data.ok === true;
+        row.dataset.busy = "";
+        if (success) {
+          markLeadSubmitted(row);
+          var email = (lead && lead.email) || SALES_EMAIL;
+          var msg = t().sent.replace("{email}", email);
+          history.push({ role: "assistant", content: msg });
+          assistantBubble(msg);
+          appendChips([t().newEnquiry, t().learnShipping]);
+        } else {
+          row.remove();
+          assistantBubble(t().sendFail);
+          appendFailActions(lead);
+        }
+      })
+      .catch(function () {
+        row.dataset.busy = "";
+        row.remove();
+        assistantBubble(t().sendFail);
+        appendFailActions(lead);
+      })
+      .then(function () { maybeScroll(); });
+  }
+
+  // Clear, non-clickable "submitted" state — prevents any further sending.
+  function markLeadSubmitted(row) {
+    row.dataset.done = "1";
+    row.innerHTML = "";
+    var pill = document.createElement("span");
+    pill.className = "mrv-sent";
+    pill.textContent = t().sentBadge;
+    row.appendChild(pill);
+  }
+
+  function appendFailActions(lead) {
+    var row = newRow();
+    var again = makeChip(t().tryAgain, true);
+    var mail = makeChip(t().emailSales, false);
+    again.addEventListener("click", function () { submitLead(lead, row, again); });
+    mail.addEventListener("click", function () { mailtoSales(lead); });
+    row.appendChild(again);
+    row.appendChild(mail);
+    els.body.appendChild(row);
+    maybeScroll();
+  }
+
+  // Fallback path: open the visitor's mail client, prefilled. No automated
+  // send, no secrets — the visitor sends it themselves.
+  function mailtoSales(lead) {
+    lead = lead || {};
+    var lines = [
+      "Name: " + (lead.name || ""),
+      "Company: " + (lead.company || ""),
+      "Email: " + (lead.email || ""),
+      "Country: " + (lead.country || ""),
+      "Destination: " + (lead.destination || ""),
+      "Product: " + (lead.product || ""),
+      "Fresh/Frozen: " + (lead.freshFrozen || ""),
+      "Approximate volume: " + (lead.volume || ""),
+      "Timing: " + (lead.timing || ""),
+      "Notes: " + (lead.notes || ""),
+    ];
+    var href =
+      "mailto:" + SALES_EMAIL +
+      "?subject=" + encodeURIComponent("Quote request — Mearva Seafood") +
+      "&body=" + encodeURIComponent(lines.join("\n"));
+    window.location.href = href;
   }
 
   function renderConversation() {

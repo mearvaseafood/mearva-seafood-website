@@ -19,6 +19,8 @@
   var API_LEAD_URL = API_URL.replace(/\/api\/chat(\/?)$/, "/api/lead$1");
 
   var SALES_EMAIL = "sales@mearvaseafood.com";
+  var PRIVACY_URL =
+    (typeof window !== "undefined" && window.MEARVA_PRIVACY_URL) || "privacy.html";
 
   var NAVY = "#0D2340";
   var TEAL = "#2A9D8F";
@@ -56,6 +58,12 @@
       editHint: "I'd like to edit the details before sending.",
       newEnquiry: "New enquiry",
       learnShipping: "How does shipping work?",
+      privacy: "Privacy",
+      privacyNote:
+        "Please don't share passwords, payment card details, ID numbers or " +
+        "sensitive personal information with Ask Mearva.",
+      leadMarketing:
+        "Yes, send me seafood availability updates and commercial offers.",
       quick: [
         "Explore Norwegian Salmon",
         "Fresh or Frozen?",
@@ -93,6 +101,12 @@
       editHint: "أريد تعديل البيانات قبل الإرسال.",
       newEnquiry: "طلب جديد",
       learnShipping: "كيف يعمل الشحن؟",
+      privacy: "الخصوصية",
+      privacyNote:
+        "يرجى عدم مشاركة كلمات المرور أو بيانات البطاقات أو أرقام الهوية أو أي " +
+        "بيانات شخصية حساسة مع Ask Mearva.",
+      leadMarketing:
+        "نعم، أرسلوا لي تحديثات توفر المنتجات والعروض التجارية.",
       quick: [
         "اكتشف السلمون النرويجي",
         "طازج أم مجمد؟",
@@ -131,6 +145,12 @@
       editHint: "Jeg vil redigere detaljene før sending.",
       newEnquiry: "Ny forespørsel",
       learnShipping: "Hvordan fungerer frakt?",
+      privacy: "Personvern",
+      privacyNote:
+        "Vennligst ikke del passord, kortopplysninger, ID-numre eller sensitiv " +
+        "personinformasjon med Ask Mearva.",
+      leadMarketing:
+        "Ja, send meg oppdateringer om sjømattilgjengelighet og kommersielle tilbud.",
       quick: [
         "Utforsk norsk laks",
         "Fersk eller fryst?",
@@ -220,6 +240,15 @@
     P + " .mrv-chip-primary:disabled{opacity:.7;cursor:default;background:" + TEAL + ";color:#fff}" +
     P + " .mrv-sent{display:inline-flex;align-items:center;gap:6px;background:#e8f3f1;color:" + NAVY + ";" +
     "border:1px solid #cfe0dc;border-radius:20px;padding:7px 13px;font-size:13.5px;font-weight:600}" +
+    // Lead handoff: optional consent + submitted state
+    P + " .mrv-lead{display:flex;flex-direction:column;gap:10px;margin:2px 0}" +
+    P + " .mrv-consent{display:flex;gap:9px;align-items:flex-start;font-size:13px;color:#42566a;line-height:1.45;cursor:pointer}" +
+    P + " .mrv-consent input[type=checkbox]{width:16px;height:16px;flex:0 0 auto;margin:1px 0 0;accent-color:" + TEAL + ";cursor:pointer}" +
+    // Legal strip under the composer (privacy link + sensitive-data notice)
+    P + " .mrv-legal{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:center;padding:7px 12px;" +
+    "border-top:1px solid #eef2f5;background:#fff;flex:0 0 auto;font-size:11px;color:#8a99a8;line-height:1.4}" +
+    P + " .mrv-legal-note{flex:1 1 150px;min-width:120px}" +
+    P + " .mrv-legal a{color:#6b7f90;text-decoration:underline;white-space:nowrap;flex:0 0 auto}" +
     // Typing
     P + " .mrv-typing{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;" +
     "background:#fff;border:1px solid #e6ebef;border-radius:14px;border-bottom-left-radius:5px;padding:11px 14px}" +
@@ -399,7 +428,9 @@
       '<button class="mrv-x" type="button" aria-label="">&times;</button></div>' +
       '<div class="mrv-body" aria-live="polite"></div>' +
       '<form class="mrv-foot"><textarea rows="1" aria-label=""></textarea>' +
-      '<button type="submit"></button></form>';
+      '<button type="submit"></button></form>' +
+      '<div class="mrv-legal"><span class="mrv-legal-note"></span>' +
+      '<a class="mrv-legal-link" target="_blank" rel="noopener"></a></div>';
 
     document.body.appendChild(launch);
     document.body.appendChild(panel);
@@ -414,6 +445,8 @@
     els.form = panel.querySelector(".mrv-foot");
     els.input = panel.querySelector("textarea");
     els.send = panel.querySelector('button[type="submit"]');
+    els.legalNote = panel.querySelector(".mrv-legal-note");
+    els.legalLink = panel.querySelector(".mrv-legal-link");
 
     els.close.addEventListener("click", closePanel);
     els.form.addEventListener("submit", onSubmit);
@@ -454,6 +487,9 @@
     els.input.setAttribute("placeholder", s.placeholder);
     els.input.setAttribute("aria-label", s.placeholder);
     els.send.textContent = s.send;
+    els.legalNote.textContent = s.privacyNote;
+    els.legalLink.textContent = s.privacy;
+    els.legalLink.setAttribute("href", PRIVACY_URL);
     els.panel.setAttribute("dir", rtl ? "rtl" : "ltr");
   }
 
@@ -507,30 +543,57 @@
   // widget shows Send / Edit, and ONLY the backend result decides whether we
   // may say "sent". Nothing here claims success on its own.
   function appendLeadActions(lead) {
+    var box = document.createElement("div");
+    box.className = "mrv-lead";
+    box.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+
+    // Optional marketing consent — unchecked by default; does NOT block sending.
+    var label = document.createElement("label");
+    label.className = "mrv-consent";
+    var cb = document.createElement("input");
+    cb.type = "checkbox";
+    var span = document.createElement("span");
+    span.textContent = t().leadMarketing;
+    label.appendChild(cb);
+    label.appendChild(span);
+    box.appendChild(label);
+
     var row = newRow();
     var send = makeChip(t().sendToSales, true);
     var edit = makeChip(t().editDetails, false);
-    send.addEventListener("click", function () { submitLead(lead, row, send); });
+    send.addEventListener("click", function () { submitLead(lead, box, row, send, cb.checked); });
     edit.addEventListener("click", function () {
-      if (row.dataset.busy === "1" || row.dataset.done === "1") return;
+      if (box.dataset.busy === "1" || box.dataset.done === "1") return;
       submitMessage(t().editHint);
     });
     row.appendChild(send);
     row.appendChild(edit);
-    els.body.appendChild(row);
+    box.appendChild(row);
+    els.body.appendChild(box);
     maybeScroll();
   }
 
-  function submitLead(lead, row, btn) {
-    if (row.dataset.busy === "1" || row.dataset.done === "1") return; // no double-submit
-    row.dataset.busy = "1";
-    row.querySelectorAll("button").forEach(function (b) { b.disabled = true; });
+  function submitLead(lead, box, row, btn, consent) {
+    if (box.dataset.busy === "1" || box.dataset.done === "1") return; // no double-submit
+    box.dataset.busy = "1";
+    box.querySelectorAll("button, input").forEach(function (el) { el.disabled = true; });
     btn.textContent = t().sending;
+
+    // Marketing consent is separate from the enquiry and defaults to "no";
+    // only a deliberate tick sends "yes". It never blocks the submission.
+    var payload = {
+      lead: lead,
+      language: lang,
+      marketing_consent: consent ? "yes" : "no",
+      marketing_consent_timestamp: new Date().toISOString(),
+      marketing_consent_source: "ask_mearva",
+      marketing_consent_language: lang,
+    };
 
     fetch(API_LEAD_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ lead: lead, language: lang }),
+      body: JSON.stringify(payload),
     })
       .then(function (r) {
         return r.json().then(function (d) { return { ok: r.ok, data: d }; }, function () {
@@ -539,8 +602,9 @@
       })
       .then(function (res) {
         var success = res.ok && res.data && res.data.ok === true;
-        row.dataset.busy = "";
+        box.dataset.busy = "";
         if (success) {
+          box.dataset.done = "1";
           markLeadSubmitted(row);
           var email = (lead && lead.email) || SALES_EMAIL;
           var msg = t().sent.replace("{email}", email);
@@ -548,23 +612,22 @@
           assistantBubble(msg);
           appendChips([t().newEnquiry, t().learnShipping]);
         } else {
-          row.remove();
+          box.remove();
           assistantBubble(t().sendFail);
-          appendFailActions(lead);
+          appendFailActions(lead, consent);
         }
       })
       .catch(function () {
-        row.dataset.busy = "";
-        row.remove();
+        box.dataset.busy = "";
+        box.remove();
         assistantBubble(t().sendFail);
-        appendFailActions(lead);
+        appendFailActions(lead, consent);
       })
       .then(function () { maybeScroll(); });
   }
 
   // Clear, non-clickable "submitted" state — prevents any further sending.
   function markLeadSubmitted(row) {
-    row.dataset.done = "1";
     row.innerHTML = "";
     var pill = document.createElement("span");
     pill.className = "mrv-sent";
@@ -572,15 +635,20 @@
     row.appendChild(pill);
   }
 
-  function appendFailActions(lead) {
+  // Preserves the visitor's consent choice across retries.
+  function appendFailActions(lead, consent) {
+    var box = document.createElement("div");
+    box.className = "mrv-lead";
+    box.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
     var row = newRow();
     var again = makeChip(t().tryAgain, true);
     var mail = makeChip(t().emailSales, false);
-    again.addEventListener("click", function () { submitLead(lead, row, again); });
+    again.addEventListener("click", function () { submitLead(lead, box, row, again, consent); });
     mail.addEventListener("click", function () { mailtoSales(lead); });
     row.appendChild(again);
     row.appendChild(mail);
-    els.body.appendChild(row);
+    box.appendChild(row);
+    els.body.appendChild(box);
     maybeScroll();
   }
 

@@ -629,7 +629,32 @@
           <label for="message" data-i18n="form.message">Message</label>
           <textarea id="message" name="message" data-i18n-ph="form.messagePh" placeholder="Products, volumes and destination" required></textarea>
         </div>
+
+        <style>
+          .marketing-optin { margin: 16px 0 4px; }
+          .marketing-optin label { display: flex; gap: 10px; align-items: flex-start; margin: 0;
+            font-size: 14px; font-weight: 400; letter-spacing: 0; color: #c4d1de; cursor: pointer; line-height: 1.55; }
+          .marketing-optin input[type="checkbox"] { width: 18px; height: 18px; min-height: 0; flex: 0 0 auto;
+            margin: 2px 0 0; padding: 0; background: #fff; border: 1px solid var(--slate); border-radius: 4px;
+            accent-color: var(--teal); cursor: pointer; appearance: auto; -webkit-appearance: auto; }
+          .form-privacy { font-size: 13px; color: var(--slate); margin: 12px 0 0; line-height: 1.6; }
+          .form-privacy a { color: var(--teal-light); text-decoration: underline; }
+          html[dir="rtl"] .marketing-optin label, html[dir="rtl"] .form-privacy { text-align: right; }
+        </style>
+
+        <!-- Optional marketing consent — unchecked by default, NOT required to submit -->
+        <div class="field marketing-optin">
+          <label>
+            <input type="checkbox" id="marketingConsent" />
+            <span data-i18n="form.marketingConsent">Yes, I would like to receive seafood availability updates and commercial offers from Mearva Seafood by email.</span>
+          </label>
+        </div>
+
         <button type="submit" class="btn btn-primary" data-i18n="form.submit">Submit request</button>
+        <p class="form-privacy">
+          <span data-i18n="form.privacyNotice">By submitting this enquiry, you acknowledge that Mearva Seafood will process the information you provide to respond to your request. See our</span>
+          <a href="privacy.html" data-i18n="form.privacyLink">Privacy Policy</a>.
+        </p>
         <p class="form-note" id="formNote" role="status" aria-live="polite"></p>
       </form>
       <div class="form-success" id="formSuccess" role="status" hidden>
@@ -659,6 +684,7 @@
           <a href="tel:+4794446668" dir="ltr">+47 94446668</a>
           <a href="mailto:sales@mearvaseafood.com">sales@mearvaseafood.com</a>
           <a href="https://www.mearvaseafood.com">www.mearvaseafood.com</a>
+          <a href="privacy.html" data-i18n="footer.privacy">Privacy Policy</a>
         </div>
       </div>
       <div class="footer-bottom">
@@ -741,6 +767,10 @@
         "form.error": "Something went wrong. Please email sales@mearvaseafood.com.",
         "form.thanks": "Thank you, {name}. We will be in touch shortly.",
         "form.success": "Thank you. We will contact you within 24 hours.",
+        "footer.privacy": "Privacy Policy",
+        "form.marketingConsent": "Yes, I would like to receive seafood availability updates and commercial offers from Mearva Seafood by email.",
+        "form.privacyNotice": "By submitting this enquiry, you acknowledge that Mearva Seafood will process the information you provide to respond to your request. See our",
+        "form.privacyLink": "Privacy Policy",
         "footer.rights": "All rights reserved."
       },
       ar: {
@@ -814,6 +844,10 @@
         "form.error": "حدث خطأ ما. يرجى المراسلة على sales@mearvaseafood.com.",
         "form.thanks": "شكرًا لك، {name}. سنتواصل معك قريبًا.",
         "form.success": "شكراً. سنتواصل معك خلال 24 ساعة.",
+        "footer.privacy": "سياسة الخصوصية",
+        "form.marketingConsent": "نعم، أرغب في تلقي تحديثات توفر المنتجات والعروض التجارية من Mearva Seafood عبر البريد الإلكتروني.",
+        "form.privacyNotice": "بإرسال هذا الطلب، فإنك تقر بأن Mearva Seafood ستعالج المعلومات التي تقدمها لغرض الرد على طلبك. راجع",
+        "form.privacyLink": "سياسة الخصوصية",
         "footer.rights": "جميع الحقوق محفوظة."
       },
       no: {
@@ -887,6 +921,10 @@
         "form.error": "Noe gikk galt. Send e-post til sales@mearvaseafood.com.",
         "form.thanks": "Takk, {name}. Vi tar kontakt snart.",
         "form.success": "Takk. Vi kontakter deg innen 24 timer.",
+        "footer.privacy": "Personvern",
+        "form.marketingConsent": "Ja, jeg ønsker å motta oppdateringer om sjømattilgjengelighet og kommersielle tilbud fra Mearva Seafood på e-post.",
+        "form.privacyNotice": "Ved å sende inn denne forespørselen bekrefter du at Mearva Seafood vil behandle informasjonen du oppgir for å svare på forespørselen din. Se vår",
+        "form.privacyLink": "Personvern",
         "footer.rights": "Med enerett."
       }
     };
@@ -960,10 +998,19 @@
         note.textContent = dict["form.sending"];
         btn.disabled = true;
 
+        // Record marketing consent — separate from the enquiry itself, defaults
+        // to NO, and only a deliberate tick sets it to yes. Not required to send.
+        var consent = document.getElementById("marketingConsent").checked ? "yes" : "no";
+        var data = new FormData(form);
+        data.append("marketing_consent", consent);
+        data.append("marketing_consent_timestamp", new Date().toISOString());
+        data.append("marketing_consent_source", "website_quote_form");
+        data.append("marketing_consent_language", currentLang);
+
         fetch("https://api.web3forms.com/submit", {
           method: "POST",
           headers: { "Accept": "application/json" },
-          body: new FormData(form)
+          body: data
         })
           .then(function (res) { return res.json(); })
           .then(function (json) {

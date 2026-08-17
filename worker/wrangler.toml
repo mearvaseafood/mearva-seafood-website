@@ -7,6 +7,17 @@
 # WEB3FORMS_KEY is the same access key the website quote form already uses
 # (delivers to sales@mearvaseafood.com). /api/lead submits to Web3Forms
 # server-side so the key never appears in widget.js or the repo.
+#
+# Phase 2E — customer confirmation email via Microsoft 365 (Microsoft Graph).
+# OFF until all of these are set AND CONFIRMATION_ENABLED = "true". Until then
+# the confirmation step is a guarded no-op and the lead flow is unaffected.
+#   npx wrangler secret put MS_TENANT_ID
+#   npx wrangler secret put MS_CLIENT_ID
+#   npx wrangler secret put MS_CLIENT_SECRET
+#   npx wrangler secret put MS_SENDER          # e.g. no-reply@mearvaseafood.com
+#   npx wrangler secret put CONFIRMATION_ENABLED   # "true" to switch on
+# Requires an Entra ID app with Mail.Send (application) permission, admin-
+# consented, ideally scoped to the sender mailbox via an Application Access Policy.
 
 name = "mearva-chat"
 main = "worker.js"

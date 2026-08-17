@@ -23,6 +23,13 @@ name = "mearva-chat"
 main = "worker.js"
 compatibility_date = "2026-08-15"
 
+# Emit structured Worker logs (viewable in the dashboard and via `wrangler tail`)
+# so the customer-confirmation path is diagnosable. Log lines carry only an event
+# name, a sanitized reason, and an HTTP status code — never secrets or PII.
+[observability]
+enabled = true
+head_sampling_rate = 1
+
 # Optional: override the model without editing code.
 # Default in worker.js is claude-sonnet-4-6.
 [vars]

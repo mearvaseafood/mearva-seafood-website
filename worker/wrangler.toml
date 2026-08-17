@@ -27,6 +27,8 @@ compatibility_date = "2026-08-15"
 # Default in worker.js is claude-sonnet-4-6.
 [vars]
 MODEL = "claude-sonnet-4-6"
+MS_SENDER = "no-reply@mearvaseafood.com"
+CONFIRMATION_ENABLED = "true"
 
 # Rate limiting store (20 requests / IP / hour). Create it once with:
 #   npx wrangler kv namespace create RATE_LIMIT

@@ -154,6 +154,9 @@ export async function sendCustomerConfirmation(lead, language, env) {
         subject,
         body: { contentType: "Text", content: body },
         toRecipients: [{ emailAddress: { address: lead.email } }],
+        // Automated send from no-reply (MS_SENDER); customer replies/follow-up
+        // are directed to the Sales inbox.
+        replyTo: [{ emailAddress: { address: SALES_EMAIL } }],
       },
       saveToSentItems: false,
     };

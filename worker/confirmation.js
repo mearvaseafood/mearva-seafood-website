@@ -113,6 +113,20 @@ function m365Configured(env) {
   );
 }
 
+// Structured, non-sensitive log line for the confirmation path. It NEVER logs
+// access tokens, the client secret, tenant/client IDs, email addresses,
+// lead/customer data, or Graph/token response bodies — only a fixed event name,
+// a sanitized reason, and (when available) an HTTP status code.
+function logConfirmation(reason, status) {
+  const entry = { event: "customer_confirmation", reason };
+  if (typeof status === "number") entry.status = status;
+  try {
+    console.log(JSON.stringify(entry));
+  } catch {
+    // Logging must never affect the flow.
+  }
+}
+
 async function getGraphToken(env) {
   const body = new URLSearchParams({
     client_id: env.MS_CLIENT_ID,
@@ -124,7 +138,12 @@ async function getGraphToken(env) {
     `https://login.microsoftonline.com/${encodeURIComponent(env.MS_TENANT_ID)}/oauth2/v2.0/token`,
     { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" }, body: body.toString() }
   );
-  if (!r.ok) return null;
+  if (!r.ok) {
+    // Non-sensitive: only the token endpoint HTTP status (e.g. 401 = bad
+    // client secret, 400 = bad request). No token or secret is logged.
+    logConfirmation("token_failed", r.status);
+    return null;
+  }
   const j = await r.json().catch(() => ({}));
   return j.access_token || null;
 }
@@ -142,11 +161,20 @@ async function getGraphToken(env) {
  */
 export async function sendCustomerConfirmation(lead, language, env) {
   try {
-    if (!lead || !lead.email) return { sent: false, reason: "no_recipient" };
-    if (!m365Configured(env)) return { sent: false, reason: "not_configured" };
+    if (!lead || !lead.email) {
+      logConfirmation("no_recipient");
+      return { sent: false, reason: "no_recipient" };
+    }
+    if (!m365Configured(env)) {
+      logConfirmation("not_configured");
+      return { sent: false, reason: "not_configured" };
+    }
 
     const token = await getGraphToken(env);
-    if (!token) return { sent: false, reason: "auth_failed" };
+    if (!token) {
+      logConfirmation("auth_failed");
+      return { sent: false, reason: "auth_failed" };
+    }
 
     const { subject, body } = buildConfirmationEmail(lead, language);
     const payload = {
@@ -169,10 +197,16 @@ export async function sendCustomerConfirmation(lead, language, env) {
       }
     );
     // Graph sendMail returns 202 Accepted on success.
-    if (r.status === 202) return { sent: true, reason: "ok" };
+    if (r.status === 202) {
+      logConfirmation("sent", r.status);
+      return { sent: true, reason: "ok" };
+    }
+    logConfirmation("send_failed", r.status);
     return { sent: false, reason: "send_failed_" + r.status };
   } catch (e) {
-    // Must never surface into the lead flow.
+    // Must never surface into the lead flow. No error detail is logged to
+    // avoid leaking anything sensitive; only a fixed reason.
+    logConfirmation("error");
     return { sent: false, reason: "error" };
   }
 }

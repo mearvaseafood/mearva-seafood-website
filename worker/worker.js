@@ -14,6 +14,7 @@
 
 import { SYSTEM_PROMPT } from "./system-prompt.js";
 import { KNOWLEDGE_BASE } from "./knowledge-base.js";
+import { sendCustomerConfirmation } from "./confirmation.js";
 
 // --- Configuration ----------------------------------------------------------
 
@@ -59,7 +60,7 @@ const LEAD_CAPS = {
 // --- Entry point ------------------------------------------------------------
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const origin = request.headers.get("Origin") || "";
     const cors = corsHeaders(origin);
 
@@ -74,7 +75,7 @@ export default {
       return handleChat(request, env, cors, ip);
     }
     if (request.method === "POST" && url.pathname === "/api/lead") {
-      return handleLead(request, env, cors, ip);
+      return handleLead(request, env, cors, ip, ctx);
     }
     return json({ error: "Not found" }, 404, cors);
   },
@@ -156,7 +157,7 @@ async function handleChat(request, env, cors, ip) {
 // Web3Forms destination (sales@mearvaseafood.com). Returns { ok: true } only
 // when Web3Forms confirms delivery, so the widget can truthfully say "sent".
 
-async function handleLead(request, env, cors, ip) {
+async function handleLead(request, env, cors, ip, ctx) {
   const rl = await checkRateLimit(env, ip, "ll", LEAD_RATE_LIMIT_MAX);
   if (!rl.ok) {
     return json({ ok: false, error: "rate_limited" }, 429, {
@@ -288,6 +289,17 @@ async function handleLead(request, env, cors, ip) {
     // Never leak upstream error internals to the browser.
     return json({ ok: false, error: "send_failed" }, 502, cors);
   }
+
+  // Phase 2E: best-effort customer confirmation — ONLY after a confirmed
+  // successful lead delivery. Fully isolated: it never affects the lead result
+  // and never delays the response (runs in the background via waitUntil). It is
+  // a no-op unless the Microsoft 365 channel is configured (see confirmation.js).
+  const confLang = SUPPORTED_LANGUAGES.includes(body && body.language)
+    ? body.language
+    : "en";
+  const confirmation = sendCustomerConfirmation(lead, confLang, env).catch(() => {});
+  if (ctx && typeof ctx.waitUntil === "function") ctx.waitUntil(confirmation);
+
   return json({ ok: true }, 200, cors);
 }
 

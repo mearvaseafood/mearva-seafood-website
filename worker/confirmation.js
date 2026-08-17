@@ -95,27 +95,79 @@ export function buildConfirmationEmail(lead, language) {
   return T[lang];
 }
 
+// --- Microsoft 365 channel (Microsoft Graph API over HTTPS) -----------------
+// Workers cannot do raw SMTP reliably, so we use Graph sendMail. Requires a
+// Microsoft Entra ID app registration with the Mail.Send application permission
+// (admin-consented), and these Worker secrets (never in code/repo):
+//   MS_TENANT_ID, MS_CLIENT_ID, MS_CLIENT_SECRET, MS_SENDER
+// Plus CONFIRMATION_ENABLED = "true" to switch it on.
+
+function m365Configured(env) {
+  return !!(
+    env &&
+    String(env.CONFIRMATION_ENABLED).toLowerCase() === "true" &&
+    env.MS_TENANT_ID &&
+    env.MS_CLIENT_ID &&
+    env.MS_CLIENT_SECRET &&
+    env.MS_SENDER
+  );
+}
+
+async function getGraphToken(env) {
+  const body = new URLSearchParams({
+    client_id: env.MS_CLIENT_ID,
+    client_secret: env.MS_CLIENT_SECRET,
+    scope: "https://graph.microsoft.com/.default",
+    grant_type: "client_credentials",
+  });
+  const r = await fetch(
+    `https://login.microsoftonline.com/${encodeURIComponent(env.MS_TENANT_ID)}/oauth2/v2.0/token`,
+    { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" }, body: body.toString() }
+  );
+  if (!r.ok) return null;
+  const j = await r.json().catch(() => ({}));
+  return j.access_token || null;
+}
+
 /**
- * Send the customer confirmation — INACTIVE until a channel is configured.
+ * Send the customer confirmation via Microsoft 365 (Graph). Best-effort.
  * Contract: call this ONLY after the lead was successfully delivered to Sales.
- * Never throws; always resolves. A no-op/failure here does not affect the lead.
+ * Never throws; always resolves. A no-op/failure here does not affect the lead,
+ * and it is only sent to the lead's own (already validated) email address.
  *
  * @param {object} lead - the delivered lead (must include a valid email)
  * @param {string} language - en | ar | no
- * @param {object} env - Worker env (a provider must be configured to actually send)
+ * @param {object} env - Worker env (M365 secrets + CONFIRMATION_ENABLED)
  * @returns {Promise<{sent:boolean, reason:string}>}
  */
 export async function sendCustomerConfirmation(lead, language, env) {
   try {
     if (!lead || !lead.email) return { sent: false, reason: "no_recipient" };
-    // No channel configured yet -> no-op. (See header note: needs a business
-    // decision on Web3Forms PRO autoresponder or a transactional provider.)
-    if (!env || !env.CONFIRMATION_ENABLED) {
-      return { sent: false, reason: "not_configured" };
-    }
-    // Future: dispatch buildConfirmationEmail(lead, language) via the configured
-    // provider here. Kept unimplemented so nothing sends until explicitly wired.
-    return { sent: false, reason: "channel_not_implemented" };
+    if (!m365Configured(env)) return { sent: false, reason: "not_configured" };
+
+    const token = await getGraphToken(env);
+    if (!token) return { sent: false, reason: "auth_failed" };
+
+    const { subject, body } = buildConfirmationEmail(lead, language);
+    const payload = {
+      message: {
+        subject,
+        body: { contentType: "Text", content: body },
+        toRecipients: [{ emailAddress: { address: lead.email } }],
+      },
+      saveToSentItems: false,
+    };
+    const r = await fetch(
+      `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(env.MS_SENDER)}/sendMail`,
+      {
+        method: "POST",
+        headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+    // Graph sendMail returns 202 Accepted on success.
+    if (r.status === 202) return { sent: true, reason: "ok" };
+    return { sent: false, reason: "send_failed_" + r.status };
   } catch (e) {
     // Must never surface into the lead flow.
     return { sent: false, reason: "error" };
